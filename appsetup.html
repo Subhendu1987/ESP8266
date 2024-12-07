@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Configuration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .section {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-row input {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-row input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+            }
+
+            .form-row input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <form id="setup-form">
+        <h2>Application Setup</h2>    
+
+        <div class="section">
+            <h3>MQTT Credentials</h3>
+            <div class="form-row">
+                <input type="text" id="mqtt_server" placeholder="MQTT Server" required>
+                <input type="number" id="mqtt_port" placeholder="MQTT Port" required>
+            </div>
+            <div class="form-row">
+                <input type="text" id="mqtt_user" placeholder="MQTT Username" required>
+                <input type="password" id="mqtt_password" placeholder="MQTT Password" required>
+            </div>
+        </div>
+
+        <button type="submit">Save Configuration</button>
+    </form>
+</div>
+
+<script>
+    // Function to load data from localStorage and populate the form
+    function loadConfiguration() {
+        const mqttServer = localStorage.getItem('hostname');
+        const mqttPort = localStorage.getItem('port');
+        const mqttUser = localStorage.getItem('username');
+        const mqttPassword = localStorage.getItem('password');
+
+        if (mqttServer) document.getElementById('mqtt_server').value = mqttServer;
+        if (mqttPort) document.getElementById('mqtt_port').value = mqttPort;
+        if (mqttUser) document.getElementById('mqtt_user').value = mqttUser;
+        if (mqttPassword) document.getElementById('mqtt_password').value = mqttPassword;
+    }
+
+    document.getElementById('setup-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        // Get input values
+        const mqttServer = document.getElementById('mqtt_server').value;
+        const mqttPort = document.getElementById('mqtt_port').value;
+        const mqttUser = document.getElementById('mqtt_user').value;
+        const mqttPassword = document.getElementById('mqtt_password').value;
+
+        // Store in localStorage
+        localStorage.setItem('hostname', mqttServer);
+        localStorage.setItem('port', mqttPort);
+        localStorage.setItem('username', mqttUser);
+        localStorage.setItem('password', mqttPassword);
+
+        window.location.href = "webcontrol.html"; // Redirect to another page
+    });
+
+    // Call the function to load data when the page loads
+    window.onload = loadConfiguration;
+</script>
+
+</body>
+</html>
