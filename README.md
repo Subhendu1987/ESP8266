@@ -63,7 +63,7 @@ A fully dynamic ESP8266-based home automation system that allows users to contro
 
 4. **Monitor Temperature and Humidity**:
    - View temperature and humidity data on the web interface or receive updates via MQTT.
-
+ ![Image Alt](https://github.com/Subhendu1987/ESP8266/blob/21f465c6bf3541a65c5407d87d6f53d62e4123c4/esp%20setup.jpg)
 ## Usage
 
 ### Web Interface
@@ -71,7 +71,7 @@ Access the web interface by entering the ESP8266's IP address in your browser. T
 - Relay toggle buttons.
 - Bulk control options.
 - Temperature and humidity readings.
-
+![Image Alt](https://github.com/Subhendu1987/ESP8266/blob/21f465c6bf3541a65c5407d87d6f53d62e4123c4/application%20setup.jpg)
 ### MQTT Topics
 - **Publish**:
   - `room/relay1/state`: Relay 1 state.
