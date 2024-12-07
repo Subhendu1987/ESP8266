@@ -2,6 +2,9 @@
 
 A fully dynamic ESP8266-based home automation system that allows users to control appliances using IR remotes, manual switches, or a web interface. The system also includes a DHT11 sensor for monitoring room temperature and humidity. No hardcoded credentials are required, making it flexible and easy to set up.
 
+ ![Image Alt](https://github.com/Subhendu1987/ESP8266/blob/0783b71cf12fec986d2e85ed57b445af37956346/dashboard.jpg)
+
+
 ## Features
 
 - **Dynamic Configuration**: 
