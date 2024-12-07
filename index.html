@@ -1,11 +1,946 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
-  </head>
-  <body>
-    <h1>Hello, world!</h1>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation</title>
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktaG91c2UtaGVhcnQiIHZpZXdCb3g9IjAgMCAxNiAxNiI+CiAgPHBhdGggZD0iTTggNi45ODJDOS42NjQgNS4zMDkgMTMuODI1IDguMjM2IDggMTIgMi4xNzUgOC4yMzYgNi4zMzYgNS4zMDkgOCA2Ljk4MiIvPgogIDxwYXRoIGQ9Ik04LjcwNyAxLjVhMSAxIDAgMCAwLTEuNDE0IDBMLjY0NiA4LjE0NmEuNS41IDAgMCAwIC43MDguNzA3TDIgOC4yMDdWMTMuNUExLjUgMS41IDAgMCAwIDMuNSAxNWg5YTEuNSAxLjUgMCAwIDAgMS41LTEuNVY4LjIwN2wuNjQ2LjY0NmEuNS41IDAgMCAwIC43MDgtLjcwN0wxMyA1Ljc5M1YyLjVhLjUuNSAwIDAgMC0uNS0uNWgtMWEuNS41IDAgMCAwLS41LjV2MS4yOTN6TTEzIDcuMjA3VjEzLjVhLjUuNSAwIDAgMS0uNS41aC05YS41LjUgMCAwIDEtLjUtLjVWNy4yMDdsNS01eiIvPgo8L3N2Zz4=" type="image/svg+xml">
+   
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #9179c1;
+        }
+
+        .responsive-area {
+            width: 422px; 
+            height: 99vh; 
+            max-width: 720px;
+            max-height: 1280px;
+            background: linear-gradient(135deg, #dbcca2, #aebbc5 30%, #a9d4b2 70%, #ffffff);
+            border: 2px solid #000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px 8px 8px 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .scrollable-area {
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .scrollable-area::-webkit-scrollbar {
+            width: 0px;
+        }
+
+        .scrollable-area::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 4px;
+        }
+
+        .scrollable-area::-webkit-scrollbar-thumb:hover {
+            background-color: #555;
+        }
+
+        .scrollable-area::-webkit-scrollbar-track {
+            background-color: #f0f0f0;
+        }
+        .retry-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .gauge {
+            width: 100%;
+            max-width: 190px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 23px;
+            color: black;
+        }
+        .fullwidth-card {
+            background-color: #4caf50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            font-size: 30px;
+            font-weight: bold;
+        }
+        .device-card {
+            width: 197px;
+            height: 130px;
+            border:#333;
+            border-radius: 12px;
+            background-color: #dbedecab;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            font-family: Arial, sans-serif;
+            margin: 3px;
+            overflow: hidden;
+        }
+        .alldevice-card {
+            width: 100%;
+            height: 70px;
+            border: #333;
+            border-radius: 12px;
+            background-color: #dbedecab;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            font-family: Arial, sans-serif;
+            margin: 5px;
+            overflow: hidden;
+        }
+        .alldevice-icon {
+            position: absolute;
+            top: 15%;
+            left: 10px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(101 76 255);
+        }
+        .alldevicepower-button {
+            border: none;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: rgb(176 76 255);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+        }
+        .systemreset-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 13px;
+            right: 18px;
+        }
+
+        .systemreset-button {
+            border: none;
+            width: 40px;
+            height: 40px;
+            background-color: rgb(176 76 255);
+            border-radius: 50%;
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+        .factoryreset-button {
+            border: none;
+            width: 40px;
+            height: 40px;
+            background-color: #db5f5f;
+            border-radius: 50%;
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        .systemreset-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .alldevice-name {
+            position: absolute;
+            bottom: 25%;
+            left: 115px;
+            font-size: 25px;
+            font-weight: bold;
+            color: #333;
+        }
+        .alldevicecard-content {
+            padding: 18px;
+            padding-top: 5%;
+            padding-left: 65%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 40%;
+            width: 4%;
+            color: #24a541;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .device-icon {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #dbcca2, #007bff47 30%, #a9d4b2 70%, #abac75);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 62px;
+        }
+        .power-button {
+            border: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background-color: rgb(176 76 255);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .device-name {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card-content {
+            padding: 18px;
+            padding-top: 50%;
+            padding-left: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 40%;
+            width: 4%;
+            color: #24a541;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .gauge_body {
+            width: 100%;
+            height: 0;
+            padding-bottom: 50%;
+            background: rgb(95, 92, 92);
+            position: relative;
+            border-top-left-radius: 100% 200%;
+            border-top-right-radius: 100% 200%;
+            overflow: hidden;
+        }
+
+        .gauge_fill {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: inherit;
+            height: 100%;
+            background: #4CAF50;
+            transform-origin: center top;
+            transform: rotate(0.25turn);
+            transition: transform 0.2s ease-out;
+        }
+
+        .gauge_cover {
+            width: 75%;
+            height: 150%;
+            background: #ccdfdd;
+            position: absolute;
+            border-radius: 50%;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 25%;
+            box-sizing: border-box;
+        }
+
+        .gaugeItems {
+            padding-left: 5px;
+            display: flex;
+            justify-content: center;
+            width: 96%;
+            margin-top: 1px;
+            gap: 10px;
+            align-content: space-around;
+            align-items: stretch;
+            flex-wrap: nowrap;
+            text-align: center;
+            padding-top: 5px;
+        }
+        .gauge_text {
+            margin-top: 7px;
+            font-size: 17px;
+            font-weight: bold;
+            position: absolute;
+            display: contents;
+        }
+        .gauge-card {
+            width: 98%;
+            height: 130px;
+            border: #333;
+            border-radius: 8px;
+            background-color: #dbedecab;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            font-family: Arial, sans-serif;
+            margin: 5px;
+        }
+        .ir-container {
+            display: flex;
+            border: 2px solid black;
+            border-radius: 8px;
+            position: relative;
+            padding: 4px;
+            width: fit-content;
+            box-sizing: border-box;
+            margin-left: 2%;
+            margin-top: 3%;
+        }
+
+        .ir-title {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #cae4d8;
+            padding: 0px 3px;
+            font-size: 12px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .ir-button-section {
+            display: grid;
+            grid-template-columns: repeat(5, auto);
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ir-button {
+            border: none;
+            width: 60px;
+            height: 35px;
+            background-color: #6a5b8b;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .ir-unset-button {
+            border: none;
+            width: 60px;
+            height: 35px;
+            background-color: #db5f5f;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        #loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column; 
+        }
+
+        .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #9179c1;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+        }
+
+        .loader-text {
+        margin-top: 10px;
+        font-size: 16px;
+        color: #ffffff;
+        font-weight: bold;
+        text-align: center;
+        }
+        @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+        }
+
+        #loader-overlay.active {
+        display: flex;
+        }
+    </style>
+    <!-- MQTT.js Library -->
+    <script src="https://unpkg.com/mqtt@5.10.3/dist/mqtt.min.js"></script>
+</head>
+<body>
+    <div id="loader-overlay">
+        <div class="loader"></div>
+        <p class="loader-text" id = "loader-text"></p>
+    </div>
+    <div class="responsive-area">
+        <div class="fullwidth-card">
+            <div id="roomname"></div>
+        </div>
+        <div class="gauge-card ">
+            <div class="gaugeItems">
+                <div class="gauge">
+                    <div class="gauge_body">
+                        <div class="gauge_fill" id= "temp_guage" style="transform: rotate(0.0turn);"></div>
+                        <div class="gauge_cover"><span id="temp">0.0</span>°C</div>
+                    </div>
+                    <div class="gauge_text">TEMPERATURE</div>
+                </div>
+                <div class="gauge">
+                    <div class="gauge_body">
+                        <div class="gauge_fill" id= "hum_guage" style="transform: rotate(0.0turn);"></div>
+                        <div class="gauge_cover"><span id="humd">0</span>%</div>
+                    </div>
+                    <div class="gauge_text">HUMIDITY</div>
+                </div>
+            </div>
+        </div>
+        <div class="scrollable-area">
+            <div class="device-card">
+                <div class="device-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="rgb(255 244 120)" class="bi bi-lightbulb-fill" viewBox="0 0 16 16">
+                        <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13h-5a.5.5 0 0 1-.46-.302l-.761-1.77a2 2 0 0 0-.453-.618A5.98 5.98 0 0 1 2 6m3 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1-.5-.5"/>
+                      </svg>
+                </div>
+                <button type="button" class="power-button" id = "power1-button" onclick="toggleRelaystate(Relaystate1,1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                        <path d="M7.5 1v7h1V1z"/>
+                        <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+                    </svg>
+                </button>        
+                <div class="device-name" id = "relay1_name"></div>
+                <div class="card-content">
+                    <span id="relay1-status"></span>
+                </div>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="rgb(255 244 120)" class="bi bi-lamp-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M5.04.303A.5.5 0 0 1 5.5 0h5c.2 0 .38.12.46.303l3 7a.5.5 0 0 1-.363.687h-.002q-.225.044-.45.081a33 33 0 0 1-4.645.425V13.5a.5.5 0 1 1-1 0V8.495a33 33 0 0 1-4.645-.425q-.225-.036-.45-.08h-.003a.5.5 0 0 1-.362-.688l3-7Z"/>
+                        <path d="M6.493 12.574a.5.5 0 0 1-.411.575c-.712.118-1.28.295-1.655.493a1.3 1.3 0 0 0-.37.265.3.3 0 0 0-.052.075l-.001.004-.004.01V14l.002.008.016.033a.6.6 0 0 0 .145.15c.165.13.435.27.813.395.751.25 1.82.414 3.024.414s2.273-.163 3.024-.414c.378-.126.648-.265.813-.395a.6.6 0 0 0 .146-.15l.015-.033L12 14v-.004a.3.3 0 0 0-.057-.09 1.3 1.3 0 0 0-.37-.264c-.376-.198-.943-.375-1.655-.493a.5.5 0 1 1 .164-.986c.77.127 1.452.328 1.957.594C12.5 13 13 13.4 13 14c0 .426-.26.752-.544.977-.29.228-.68.413-1.116.558-.878.293-2.059.465-3.34.465s-2.462-.172-3.34-.465c-.436-.145-.826-.33-1.116-.558C3.26 14.752 3 14.426 3 14c0-.599.5-1 .961-1.243.505-.266 1.187-.467 1.957-.594a.5.5 0 0 1 .575.411"/>
+                      </svg>
+                </div>
+                <button type="button" class="power-button" id = "power2-button" onclick="toggleRelaystate(Relaystate2,2)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                        <path d="M7.5 1v7h1V1z"/>
+                        <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+                    </svg>
+                </button>
+                <div class="device-name" id = "relay2_name"></div>
+                <div class="card-content">
+                    <span id="relay2-status"></span>
+                </div>
+            </div>
+            <div class="device-card">
+                <div class="device-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="rgb(255 244 120)" class="bi bi-outlet" viewBox="0 0 16 16">
+                        <path d="M3.34 2.994c.275-.338.68-.494 1.074-.494h7.172c.393 0 .798.156 1.074.494.578.708 1.84 2.534 1.84 5.006s-1.262 4.297-1.84 5.006c-.276.338-.68.494-1.074.494H4.414c-.394 0-.799-.156-1.074-.494C2.762 12.297 1.5 10.472 1.5 8s1.262-4.297 1.84-5.006m1.074.506a.38.38 0 0 0-.299.126C3.599 4.259 2.5 5.863 2.5 8s1.099 3.74 1.615 4.374c.06.073.163.126.3.126h7.17c.137 0 .24-.053.3-.126.516-.633 1.615-2.237 1.615-4.374s-1.099-3.74-1.615-4.374a.38.38 0 0 0-.3-.126h-7.17z"/>
+                        <path d="M6 5.5a.5.5 0 0 1 .5.5v1.5a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v1.5a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5M7 10v1h2v-1a1 1 0 0 0-2 0"/>
+                      </svg>
+                </div>
+                <button type="button" class="power-button" id = "power3-button" onclick="toggleRelaystate(Relaystate3,3)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                        <path d="M7.5 1v7h1V1z"/>
+                        <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+                    </svg>
+                </button>
+                <div class="device-name" id = "relay3_name"></div>
+                <div class="card-content">
+                    <span id="relay3-status"></span>
+                </div>
+            </div>
+            <div class="device-card">
+                <div class="device-icon"><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="rgb(255 244 120)" class="bi bi-ethernet" viewBox="0 0 16 16">
+                    <path d="M14 13.5v-7a.5.5 0 0 0-.5-.5H12V4.5a.5.5 0 0 0-.5-.5h-1v-.5A.5.5 0 0 0 10 3H6a.5.5 0 0 0-.5.5V4h-1a.5.5 0 0 0-.5.5V6H2.5a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5M3.75 11h.5a.25.25 0 0 1 .25.25v1.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-1.5a.25.25 0 0 1 .25-.25m2 0h.5a.25.25 0 0 1 .25.25v1.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-1.5a.25.25 0 0 1 .25-.25m1.75.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v1.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25zM9.75 11h.5a.25.25 0 0 1 .25.25v1.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-1.5a.25.25 0 0 1 .25-.25m1.75.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v1.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25z"/>
+                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1z"/>
+                  </svg>
+                </div>
+                <button type="button" class="power-button" id = "power4-button" onclick="toggleRelaystate(Relaystate4,4)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                        <path d="M7.5 1v7h1V1z"/>
+                        <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+                    </svg>
+                </button>
+                <div class="device-name" id = "relay4_name"></div>
+                <div class="card-content">
+                    <span id="relay4-status"></span>
+                </div>
+            </div>
+            <div class="alldevice-card">
+                <div class="alldevice-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="65" height="65" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
+                    <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
+                    <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z"/>
+                  </svg>
+                </div>
+                <button type="button" class="alldevicepower-button" id = "allpower-button" onclick="togglePowerall()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                        <path d="M7.5 1v7h1V1z"/>
+                        <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+                    </svg>
+                </button>
+                <div class="alldevice-name" id = "allbanner"></div>
+                <div class="alldevicecard-content">
+                    <span id="allrelay-status"></span>
+                </div>
+            </div> 
+            <div class="alldevice-card">
+                 <div class="systemreset-container">
+                    <button type="button" class="systemreset-button" onclick="restartesp()" title="Restart">                     
+                        <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="currentColor" class="bi bi-bootstrap-reboot" viewBox="0 0 16 16">
+                            <path d="M1.161 8a6.84 6.84 0 1 0 6.842-6.84.58.58 0 1 1 0-1.16 8 8 0 1 1-6.556 3.412l-.663-.577a.58.58 0 0 1 .227-.997l2.52-.69a.58.58 0 0 1 .728.633l-.332 2.592a.58.58 0 0 1-.956.364l-.643-.56A6.8 6.8 0 0 0 1.16 8z"/>
+                            <path d="M6.641 11.671V8.843h1.57l1.498 2.828h1.314L9.377 8.665c.897-.3 1.427-1.106 1.427-2.1 0-1.37-.943-2.246-2.456-2.246H5.5v7.352zm0-3.75V5.277h1.57c.881 0 1.416.499 1.416 1.32 0 .84-.504 1.324-1.386 1.324z"/>
+                        </svg>
+                    </button>
+                    <div class="systemreset-title">Reboot</div>
+                </div>
+                
+
+                <div class="ir-container">
+                    <div class="ir-button-section">
+                        <button type="button" class="ir-button" onclick ="setir(1)" id ="irsetbtn_1"></button>
+                        <button type="button" class="ir-button" onclick ="setir(2)" id ="irsetbtn_2"></button>
+                        <button type="button" class="ir-button" onclick ="setir(3)" id ="irsetbtn_3"></button>
+                        <button type="button" class="ir-button" onclick ="setir(4)" id ="irsetbtn_4"></button>
+                        <button type="button" class="ir-button" id="sab" onclick ="setir(5)"  title="Set Remote for All"></button>
+                    </div>
+                    <div class="ir-title">Set Remote</div>
+                </div>
+        
+            </div> 
+            <div class="alldevice-card">
+                <div class="systemreset-container">
+                   <button type="button" class="factoryreset-button" onclick="resetesp()" title="Reset">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                           <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                           <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+                       </svg>
+                   </button>
+                   <div class="systemreset-title">Reset</div>
+               </div>
+               
+
+               <div class="ir-container">
+                   <div class="ir-button-section">
+                       <button type="button" class="ir-unset-button" onclick ="unsetir(1)" id ="irunsetbtn_1"></button>
+                       <button type="button" class="ir-unset-button" onclick ="unsetir(2)" id ="irunsetbtn_2"></button>
+                       <button type="button" class="ir-unset-button" onclick ="unsetir(3)" id ="irunsetbtn_3"></button>
+                       <button type="button" class="ir-unset-button" onclick ="unsetir(4)" id ="irunsetbtn_4"></button>
+                       <button type="button" class="ir-unset-button" id = "usab" onclick ="unsetir(5)"  title="Unset Remote from All"></button>
+                   </div>
+                   <div class="ir-title">Unset Remote</div>
+               </div>
+       
+           </div> 
+        </div>
+    </div>
+
+    <script>
+        let timer;
+    
+        function setup() {
+            window.location.href = "appsetup.html";
+        }
+    
+        const roomname = document.getElementById("roomname");
+
+        roomname.addEventListener("mousedown", startPress);
+        roomname.addEventListener("mouseup", cancelPress);
+        roomname.addEventListener("mouseleave", cancelPress);
+    
+        roomname.addEventListener("touchstart", startPress);
+        roomname.addEventListener("touchend", cancelPress);
+        roomname.addEventListener("touchcancel", cancelPress);
+    
+        function startPress(event) {
+            timer = setTimeout(() => {
+                setup();
+            }, 2000);
+        }
+    
+        function cancelPress(event) {
+            clearTimeout(timer);
+        }
+    </script>
+
+    <script>
+        let hostname;
+        let port;
+        let username;
+        let password;
+    function checkStorage() {
+        hostname = localStorage.getItem("hostname");
+        port = localStorage.getItem("port");
+        username = localStorage.getItem("username");
+        password = localStorage.getItem("password");
+
+        // Check if any value is missing
+        if (!hostname || !port || !username || !password) {
+            window.location.href = "appsetup.html";
+        }
+    }
+
+    // Call the function to check storage
+    checkStorage();
+    let Relaystate1     = false;
+    let Relaystate2     = false;
+    let Relaystate3     = false;
+    let Relaystate4     = false;
+    let AllRelaystate   = false;
+
+    const powerOffIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                    <path d="M7.5 1v7h1V1z"/>
+                    <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+            </svg>`;
+    const powerOnIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+            </svg>`;
+    const allpowerOnicon = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                <path d="M7.5 1v7h1V1z"/>
+                <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+            </svg>
+            `;
+    const allpowerOfficon = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+            </svg>
+            `;
+
+
+
+    const options = {
+        hostname: hostname,
+        port: port,
+        protocol: "wss",
+        path: "/mqtt",
+        username: username, 
+        password: password,
+    };
+
+    const client = mqtt.connect(options);
+
+    client.on("connect", () => {
+        client.subscribe("home/relay/all/status");
+        client.subscribe("home/dht/data");
+        requestRelayStatus();
+    });
+
+    client.on("error", (err) => {
+        console.log(err);
+    });
+
+    function requestRelayStatus() {
+        client.publish("home/relay/all/get", "status");
+    }
+
+ 
+    client.on("message", (topic, message) => {
+        
+        if (topic === "home/relay/all/status") {
+                hideLoader();
+                AllRelaystate   = false;  
+                Relaystate1     = false;
+                Relaystate2     = false;
+                Relaystate3     = false;
+                Relaystate4     = false;
+                const statusArray = JSON.parse(message.toString());
+                const keys = Object.keys(statusArray);
+             
+
+                document.getElementById("roomname").innerText = statusArray[keys[0]];
+                document.title = statusArray[keys[0]];
+
+                document.getElementById("relay1_name").innerText = keys[1];
+                document.getElementById("irsetbtn_1").innerText = keys[1];
+                document.getElementById("irunsetbtn_1").innerText = keys[1];
+                document.getElementById("irsetbtn_1").title = "Set Remote for " + keys[1];
+                document.getElementById("irunsetbtn_1").title = "Unset Remote from " + keys[1];
+
+                document.getElementById("relay2_name").innerText = keys[2];
+                document.getElementById("irsetbtn_2").innerText = keys[2];
+                document.getElementById("irunsetbtn_2").innerText = keys[2];
+                document.getElementById("irsetbtn_2").title = "Set Remote for " + keys[2];
+                document.getElementById("irunsetbtn_2").title = "Unset Remote from " + keys[2];
+
+                document.getElementById("relay3_name").innerText = keys[3];
+                document.getElementById("irsetbtn_3").innerText = keys[3];
+                document.getElementById("irunsetbtn_3").innerText = keys[3];
+                document.getElementById("irsetbtn_3").title = "Set Remote for " + keys[3];
+                document.getElementById("irunsetbtn_3").title = "Unset Remote from " + keys[3];
+
+                document.getElementById("relay4_name").innerText = keys[4];
+                document.getElementById("irsetbtn_4").innerText = keys[4];
+                document.getElementById("irunsetbtn_4").innerText = keys[4]; 
+                document.getElementById("irsetbtn_4").title = "Set Remote for " + keys[4];
+                document.getElementById("irunsetbtn_4").title = "Unset Remote from " + keys[4];      
+                
+                              
+                document.getElementById("allbanner").textContent = 'All';
+                document.getElementById("sab").textContent = 'All';
+                document.getElementById("usab").textContent = 'All';
+                
+                const powerButton1 = document.querySelector('#power1-button');
+                const statusText1 = document.querySelector('#relay1-status');            
+                if(statusArray[keys[1]] == 'on'){
+                    Relaystate1 = true;
+                    AllRelaystate = true;                     
+                    powerButton1.innerHTML = powerOffIcon;
+                    powerButton1.style.backgroundColor = "rgb(176, 76, 255)";
+                    statusText1.textContent = "ON";
+                    statusText1.style.color = "#24a541";                    
+                }else{
+                    Relaystate1 = false;   
+                    powerButton1.innerHTML = powerOnIcon;
+                    powerButton1.style.backgroundColor = "rgb(76, 144, 175)";
+                    statusText1.textContent = "OFF";
+                    statusText1.style.color = "rgb(219, 83, 83)";
+                }
+
+                const powerButton2 = document.querySelector('#power2-button');
+                const statusText2 = document.querySelector('#relay2-status');            
+                if(statusArray[keys[2]] == 'on'){
+                    Relaystate2 = true;
+                    AllRelaystate = true;                     
+                    powerButton2.innerHTML = powerOffIcon;
+                    powerButton2.style.backgroundColor = "rgb(176, 76, 255)";
+                    statusText2.textContent = "ON";
+                    statusText2.style.color = "#24a541";                    
+                }else{
+                    Relaystate2 = false;  
+                    powerButton2.innerHTML = powerOnIcon;
+                    powerButton2.style.backgroundColor = "rgb(76, 144, 175)";
+                    statusText2.textContent = "OFF";
+                    statusText2.style.color = "rgb(219, 83, 83)";
+                } 
+                
+                const powerButton3 = document.querySelector('#power3-button');
+                const statusText3 = document.querySelector('#relay3-status');            
+                if(statusArray[keys[3]] == 'on'){
+                    Relaystate3 = true;
+                    AllRelaystate = true;                     
+                    powerButton3.innerHTML = powerOffIcon;
+                    powerButton3.style.backgroundColor = "rgb(176, 76, 255)";
+                    statusText3.textContent = "ON";
+                    statusText3.style.color = "#24a541";                    
+                }else{
+                    Relaystate3 = false; 
+                    powerButton3.innerHTML = powerOnIcon;
+                    powerButton3.style.backgroundColor = "rgb(76, 144, 175)";
+                    statusText3.textContent = "OFF";
+                    statusText3.style.color = "rgb(219, 83, 83)";
+                }
+
+                const powerButton4 = document.querySelector('#power4-button');
+                const statusText4 = document.querySelector('#relay4-status');            
+                if(statusArray[keys[4]] == 'on'){
+                    Relaystate4 = true;
+                    AllRelaystate = true;                     
+                    powerButton4.innerHTML = powerOffIcon;
+                    powerButton4.style.backgroundColor = "rgb(176, 76, 255)";
+                    statusText4.textContent = "ON";
+                    statusText4.style.color = "#24a541";                    
+                }else{
+                    Relaystate4 = false; 
+                    powerButton4.innerHTML = powerOnIcon;
+                    powerButton4.style.backgroundColor = "rgb(76, 144, 175)";
+                    statusText4.textContent = "OFF";
+                    statusText4.style.color = "rgb(219, 83, 83)";
+                }
+
+                const allpowerOnicon = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-power" viewBox="0 0 16 16">
+                                <path d="M7.5 1v7h1V1z"/>
+                                <path d="M3 8.812a5 5 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812"/>
+                            </svg>
+                            `;
+                const allpowerOfficon = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            </svg>
+                            `;
+                const allpowerButton = document.querySelector('#allpower-button');
+                const allstatusText = document.querySelector('#allrelay-status');
+
+                
+                if(AllRelaystate){
+                    allpowerButton.innerHTML = allpowerOnicon;
+                    allpowerButton.style.backgroundColor = "rgb(176, 76, 255)";
+                    allstatusText.textContent = "ON";
+                    allstatusText.style.color = "#24a541";  
+                }else{
+                    allpowerButton.innerHTML = allpowerOfficon;
+                    allpowerButton.style.backgroundColor = "rgb(76, 144, 175)";
+                    allstatusText.textContent = "OFF";
+                    allstatusText.style.color = "rgb(219, 83, 83)";
+                    
+                }
+        }
+      
+        if (topic === "home/dht/data") {
+                const dhtdata = JSON.parse(message.toString());
+                let temprotation = (parseFloat(dhtdata[0]) / 100) * 0.50;
+                document.querySelector('#temp_guage').style.transform = `rotate(${temprotation}turn)`;
+                document.getElementById('temp').textContent = parseFloat(dhtdata[0]).toFixed(1);
+
+                let humdrotation = (parseFloat(dhtdata[1]) / 100) * 0.50;
+                document.querySelector('#hum_guage').style.transform = `rotate(${humdrotation}turn)`;
+                document.getElementById('humd').textContent = parseFloat(dhtdata[1]).toFixed(0);
+        }
+    });
+
+
+    function toggleRelaystate(x,y){ 
+        showLoader(false);
+        const topic = `home/relay/${y}/set`;
+        const message = x ? "off" : "on";
+        client.publish(topic, message);
+    }
+
+    
+    
+    function togglePowerall(){
+        showLoader(false);
+        if(AllRelaystate){
+            client.publish("home/relay/all/set", "off");
+        }else{
+            client.publish("home/relay/all/set", "on");
+        }
+        AllRelaystate = !AllRelaystate;
+    }  
+    function setir(x){
+        showLoader(false, "Press Remote's Button");
+        if(x == 5){
+            client.publish("home/ir/all/set", options.username);
+        }else{
+            client.publish(`home/ir/${x}/set`, options.username);
+        }
+        
+    }
+    function unsetir(x){
+        showLoader(false, "Removing....");
+        if(x == 5){
+            client.publish("home/ir/all/unset", options.username);
+        }else{
+            client.publish(`home/ir/${x}/unset`, options.username);
+        }
+        
+    }
+
+    function restartesp(){
+        showLoader(false, "Restarting....");
+        client.publish("home/automation/reset", options.username);
+    }
+    function resetesp(){
+        showLoader(false, "Factory Reseting....");
+        client.publish("home/factory/reset", options.username);
+    }
+
+    function showLoader(state,y = "") {
+    const loaderOverlay = document.getElementById('loader-overlay');
+    const loaderText = document.getElementById('loader-text');
+
+    // Set the loader text
+    loaderText.textContent = y;
+
+    // Show the loader overlay
+    loaderOverlay.classList.add('active');
+
+    // Clear any existing timer
+    clearTimeout(loaderOverlay.alertTimeout);
+    if (state){
+
+        // Set a timeout to replace the loader text with a button
+        loaderOverlay.alertTimeout = setTimeout(() => {
+            if (loaderOverlay.classList.contains('active')) {
+                // Clear the loader text
+                loaderText.textContent = "";
+
+                // Create a button dynamically
+                const retryButton = document.createElement("button");
+                retryButton.textContent = "Setup";
+                retryButton.className = "retry-button";
+                retryButton.onclick = () => {
+                    setup();
+                };
+
+                // Add the button in place of the loader text
+                loaderText.appendChild(retryButton);
+            }
+        }, 10000);
+    }else{
+        loaderOverlay.classList.add('active');
+    }
+
+}
+
+
+
+    function hideLoader() {
+    const loaderOverlay = document.getElementById('loader-overlay');
+    loaderOverlay.classList.remove('active');
+    }
+    showLoader(true, "Loading...");
+    </script>
+
+
+</body>
 </html>
