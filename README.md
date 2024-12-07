@@ -86,6 +86,10 @@ Access the web interface by entering the ESP8266's IP address in your browser. T
 ### IR Remote
 Configure the IR remote by capturing IR codes during setup. Use the remote to toggle individual relays dynamically.
 
+## Demo
+
+[Live Demo](https://subhendu1987.github.io/ESP8266/)
+
 ## Contributing
 Contributions are welcome! Feel free to fork the repository, create new features, or report issues.
 
