@@ -88,7 +88,7 @@ Configure the IR remote by capturing IR codes during setup. Use the remote to to
 
 ## Demo
 
-[Live Demo](https://subhendu1987.github.io/ESP8266/)
+[Live Demo](https://subhendu1987.github.io/ESP8266-ESP32-Home-Automation/)
 
 ## Contributing
 Contributions are welcome! Feel free to fork the repository, create new features, or report issues.
