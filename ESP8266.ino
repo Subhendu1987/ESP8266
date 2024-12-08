@@ -26,7 +26,7 @@
 
 #define DOUBLE_RESET_INTERVAL 5000 // 5 seconds (time window for the second reset)
 unsigned long previousrestarMillis = 0;
-const unsigned long resetinmls = 21600000; // 6 hours in milliseconds to schedule restart
+const unsigned long resetinmls = 10800000; // 3 hours in milliseconds to schedule restart
 const unsigned long dhtpublishinterval = 60000; // 1 minutes interval for publish dht data
 
 bool setupmode = false;
@@ -80,6 +80,11 @@ bool previousSwitchStates4 = true;
 bool isInSetMode = false;
 
 int currentSetRelay = -1;
+
+unsigned long retryInterval = 10000; // Retry interval in milliseconds
+unsigned long lastRetryTime = 0;     // Timestamp of the last retry attempt
+bool wifiConnected = false;
+bool mqttsubscribe = false;
 
 void checkDoubleReset() {
     // Read the reset flag and last reset time from EEPROM
@@ -752,13 +757,21 @@ void connectToWiFi(){
   Serial.println("Connecting to Wi-Fi...");
   WiFi.begin(readEEPROMString(SSID_ADDR, 32).c_str(), readEEPROMString(PASS_ADDR, 32).c_str()); 
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  unsigned long startTime = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - startTime < retryInterval) {
+    delay(500); // Check periodically
+    return;
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    wifiConnected = true; // Mark Wi-Fi as connected
+    Serial.println("\nConnected to Wi-Fi!");
+    connectToMQTT();
+  } else {
+    Serial.println("\nConnection failed. Will retry...");
   }
 }
 void connectToMQTT(){
-  if (WiFi.status() == WL_CONNECTED){
+  if (WiFi.status() == WL_CONNECTED && !mqttsubscribe){
       // Configure WiFiClientSecure
       net.setInsecure();
 
@@ -807,6 +820,8 @@ void connectToMQTT(){
       relayName3 = readEEPROMString(RELAY_THREE, 30);
       relayName4 = readEEPROMString(RELAY_FOUR, 30);
 
+      mqttsubscribe = true;
+
       // Publish start status
       publishAllRelayStates();
 
@@ -816,7 +831,6 @@ void connectToMQTT(){
   return; 
 
 }
-
 
 
 void setup() {
@@ -869,8 +883,7 @@ void setup() {
 
     // Initialize IR receiver
     irrecv.enableIRIn();
-    connectToWiFi();
-    connectToMQTT();
+    
   }
   
 }
@@ -883,18 +896,26 @@ void loop() {
     handleSwitches();
     handleIRSignal();
     handleIRSetMode();
-    
 
-    // Maintain MQTT connection
-    client.loop();
-    
-
-    // Periodically publish messages
-    static unsigned long lastPublish = 0;
-    if (millis() - lastPublish > dhtpublishinterval) {
-      lastPublish = millis();
-      publishDHTData();
+    if (!wifiConnected) {
+      unsigned long currentTime = millis();
+      if (currentTime - lastRetryTime >= retryInterval) {
+        connectToWiFi();
+        lastRetryTime = currentTime; 
+      }
+    } else {
+      // Maintain MQTT connection
+      client.loop();
+      // Periodically publish messages
+      static unsigned long lastPublish = 0;
+      if (millis() - lastPublish > dhtpublishinterval) {
+        lastPublish = millis();
+        publishDHTData();
+      }
     }
+    
+
+
     if (millis() - previousrestarMillis >= resetinmls) {
       ESP.restart();
     }
