@@ -1,4 +1,4 @@
-# ESP8266 Home Automation - Dynamic Setup
+# ESP8266/ESP32 Home Automation - Dynamic Setup
 
 A fully dynamic ESP8266-based home automation system that allows users to control appliances using IR remotes, manual switches, or a web interface. The system also includes a DHT11 sensor for monitoring room temperature and humidity. No hardcoded credentials are required, making it flexible and easy to set up.
 
