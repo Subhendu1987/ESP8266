@@ -1,14 +1,26 @@
+#include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <EEPROM.h>
-#include <IRrecv.h>
-#include <IRremoteESP8266.h>
-#include <IRutils.h>
+#include <IRremote.hpp> 
 #include <DHT.h>
 #include <MQTT.h>
+#include <WiFiClientSecure.h>
+
+int relayPin1 = 23;
+int relayPin2 = 22;
+int relayPin3 = 21;
+int relayPin4 = 19;
+
+int switchPin1 = 27;
+int switchPin2 = 14;
+int switchPin3 = 12;
+int switchPin4 = 13;
 
 
+int irPin = 4;
+int dhtPin = 5;
 
 #define SSID_ADDR 60         // Starting address for Wi-Fi SSID
 #define PASS_ADDR 70         // Starting address for Wi-Fi Password
@@ -32,6 +44,7 @@ const unsigned long dhtpublishinterval = 60000; // 1 minutes interval for publis
 
 bool setupmode = false;
 
+
 // DNS Server
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
@@ -39,30 +52,15 @@ DNSServer dnsServer;
 // Web server on port 80
 WebServer server(80);
 
-WiFiClient  net;
+// MQTT client
+WiFiClientSecure net;
 MQTTClient client;
 
-int relayPin1 = 5;
-int relayPin2 = 4;
-int relayPin3 = 0;
-int relayPin4 = 2;
-
-int switchPin1 = 14;
-int switchPin2 = 12;
-int switchPin3 = 3;
-int switchPin4 = 1;
-// int switchPin4 = 15;
-
-
-int irPin = 13;
-int dhtPin = 9;
-
-IRrecv irrecv(irPin);
+#define IR_RECEIVE_PIN irPin
 decode_results results;
 
-// DHT Configuration
 #define DHTPIN dhtPin
-#define DHTTYPE DHT11   // DHT 11 sensor type
+#define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 unsigned long lastDHTPublishTime = 0; // Stores the last publish time
 const unsigned long DHTPublishInterval = 600000; // 5 minutes in milliseconds
@@ -149,6 +147,7 @@ String trimString(const String &str) {
     // Return the trimmed substring
     return str.substring(start, end + 1);
 }
+
 // Function to check credentials in EEPROM
 bool checkCredentials() {
     // Helper function to read strings from EEPROM
@@ -518,12 +517,16 @@ void handleSwitches() {
 void handleIRSignal() {
   if (isInSetMode) return; // Skip if in set mode
 
-  if (irrecv.decode(&results)) {
+  if (IrReceiver.decode()) {
+    uint32_t receivedCode = IrReceiver.decodedIRData.decodedRawData; // Get the raw IR data
+
     uint32_t irCodes1;
     uint32_t irCodes2;
     uint32_t irCodes3;
     uint32_t irCodes4;
     uint32_t irCodes5;
+
+    // Retrieve stored IR codes from EEPROM
     EEPROM.get(10, irCodes1);
     EEPROM.get(20, irCodes2);
     EEPROM.get(30, irCodes3);
@@ -531,27 +534,27 @@ void handleIRSignal() {
     EEPROM.get(50, irCodes5);
 
     // Check and handle the received IR code
-    if (results.value == irCodes1) {
+    if (receivedCode == irCodes1) {
       relayStates1 = !relayStates1;
       digitalWrite(relayPin1, relayStates1 ? LOW : HIGH);
       saveRelayStates();
       publishAllRelayStates();
-    } else if (results.value == irCodes2) {
+    } else if (receivedCode == irCodes2) {
       relayStates2 = !relayStates2;
       digitalWrite(relayPin2, relayStates2 ? LOW : HIGH);
       saveRelayStates();
       publishAllRelayStates();
-    } else if (results.value == irCodes3) {
+    } else if (receivedCode == irCodes3) {
       relayStates3 = !relayStates3;
       digitalWrite(relayPin3, relayStates3 ? LOW : HIGH);
       saveRelayStates();
       publishAllRelayStates();
-    } else if (results.value == irCodes4) {
+    } else if (receivedCode == irCodes4) {
       relayStates4 = !relayStates4;
       digitalWrite(relayPin4, relayStates4 ? LOW : HIGH);
       saveRelayStates();
       publishAllRelayStates();
-    } else if (results.value == irCodes5) {
+    } else if (receivedCode == irCodes5) {
       relayStates5 = !relayStates5;
 
       // Toggle all relays together
@@ -568,10 +571,11 @@ void handleIRSignal() {
       publishAllRelayStates();
     }
 
-
-    irrecv.resume();
+    // Resume the IR receiver for the next signal
+    IrReceiver.resume();
   }
 }
+
 // Handle IR Set Mode
 void handleIRSetMode() {
   if (!isInSetMode) return;
@@ -583,67 +587,77 @@ void handleIRSetMode() {
   if (millis() - lastBlinkTime >= 500) {
     lastBlinkTime = millis();
     ledState = !ledState;
-    if(currentSetRelay == 1){
-     digitalWrite(relayPin1, ledState ? LOW : HIGH);
-    }
-    if(currentSetRelay == 2){
-     digitalWrite(relayPin2, ledState ? LOW : HIGH);
-    }
-    if(currentSetRelay == 3){
-     digitalWrite(relayPin3, ledState ? LOW : HIGH);
-    }
-    if(currentSetRelay == 4){
-     digitalWrite(relayPin4, ledState ? LOW : HIGH);
-    }
-    if(currentSetRelay == 5){
-     digitalWrite(relayPin1, ledState ? LOW : HIGH);
-     digitalWrite(relayPin2, ledState ? LOW : HIGH);
-     digitalWrite(relayPin3, ledState ? LOW : HIGH);
-     digitalWrite(relayPin4, ledState ? LOW : HIGH);
-    }
-    
-  }
 
-  if (irrecv.decode(&results)) {
-
-    // Assign the detected IR code
+    // Toggle the corresponding relay's state for blinking
     switch (currentSetRelay) {
       case 1:
-        EEPROM.put(10, results.value);
+        digitalWrite(relayPin1, ledState ? LOW : HIGH);
+        break;
+      case 2:
+        digitalWrite(relayPin2, ledState ? LOW : HIGH);
+        break;
+      case 3:
+        digitalWrite(relayPin3, ledState ? LOW : HIGH);
+        break;
+      case 4:
+        digitalWrite(relayPin4, ledState ? LOW : HIGH);
+        break;
+      case 5:
+        digitalWrite(relayPin1, ledState ? LOW : HIGH);
+        digitalWrite(relayPin2, ledState ? LOW : HIGH);
+        digitalWrite(relayPin3, ledState ? LOW : HIGH);
+        digitalWrite(relayPin4, ledState ? LOW : HIGH);
+        break;
+    }
+  }
+
+  // Check for IR signal reception
+  if (IrReceiver.decode()) {
+    uint32_t receivedCode = IrReceiver.decodedIRData.decodedRawData; // Get the raw IR data
+
+    // Store the IR code in EEPROM based on the current relay being set
+    switch (currentSetRelay) {
+      case 1:
+        EEPROM.put(10, receivedCode);
         EEPROM.commit();
         break;
       case 2:
-        EEPROM.put(20, results.value);
+        EEPROM.put(20, receivedCode);
         EEPROM.commit();
         break;
       case 3:
-        EEPROM.put(30, results.value);
+        EEPROM.put(30, receivedCode);
         EEPROM.commit();
         break;
       case 4:
-        EEPROM.put(40, results.value);
+        EEPROM.put(40, receivedCode);
         EEPROM.commit();
         break;
       case 5:
-        EEPROM.put(50, results.value);
+        EEPROM.put(50, receivedCode);
         EEPROM.commit();
         break;
     }
 
-    // Exit set mode
+    // Exit set mode and reset the relay states
     isInSetMode = false;
     currentSetRelay = -1;
-    if(currentSetRelay != 1){
+
+    // Restore the relay states if not setting a relay
+    if (currentSetRelay != 1) {
       digitalWrite(relayPin1, relayStates1 ? LOW : HIGH);
       digitalWrite(relayPin2, relayStates2 ? LOW : HIGH);
       digitalWrite(relayPin3, relayStates3 ? LOW : HIGH);
-      digitalWrite(relayPin4, relayStates4 ? LOW : HIGH);  
-      irrecv.resume();
+      digitalWrite(relayPin4, relayStates4 ? LOW : HIGH);
+
       publishAllRelayStates();
     }
-    
+
+    // Resume the IR receiver for the next signal
+    IrReceiver.resume();
   }
 }
+
 
 
 
@@ -755,14 +769,15 @@ void messageReceived(String &topic, String &payload) {
 }
 
 void connectToWiFi(){
-  Serial.println("Connecting to Wi-Fi...");
-  WiFi.begin(readEEPROMString(SSID_ADDR, 32).c_str(), readEEPROMString(PASS_ADDR, 32).c_str()); 
 
-  unsigned long startTime = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - startTime < retryInterval) {
-    delay(500); // Check periodically
-    return;
+
+  WiFi.begin(readEEPROMString(SSID_ADDR, 32).c_str(), readEEPROMString(PASS_ADDR, 32).c_str()); 
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
   }
+  Serial.println("\nWi-Fi connected");
+
   if (WiFi.status() == WL_CONNECTED) {
     wifiConnected = true; // Mark Wi-Fi as connected
     Serial.println("\nConnected to Wi-Fi!");
@@ -773,6 +788,9 @@ void connectToWiFi(){
 }
 void connectToMQTT(){
   if (WiFi.status() == WL_CONNECTED && !mqttsubscribe){
+    // Configure WiFiClientSecure
+      net.setInsecure();
+   
       // Initialize MQTT client
       String mqttServer = trimString(trimProtocol(readEEPROMString(MQTT_SERVER_ADDR, 80)));
       client.begin(mqttServer.c_str(), readEEPROMInt(MQTT_PORT_ADDR), net);
@@ -830,11 +848,10 @@ void connectToMQTT(){
 
 }
 
-
 void setup() {
   Serial.begin(115200);
   EEPROM.begin(2048);
-  
+
   Serial.println("Checking for double reset...");
   checkDoubleReset(); // Check if this is a double reset
 
@@ -880,7 +897,7 @@ void setup() {
 
 
     // Initialize IR receiver
-    irrecv.enableIRIn();
+    IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
     
   }
   
@@ -902,16 +919,16 @@ void loop() {
         lastRetryTime = currentTime; 
       }
     } else {
-      // Maintain MQTT connection
-      client.loop();
-      // Periodically publish messages
-      static unsigned long lastPublish = 0;
-      if (millis() - lastPublish > dhtpublishinterval) {
-        lastPublish = millis();
-        publishDHTData();
-      }
+      
     }
-    
+    // Maintain MQTT connection
+    client.loop();
+    // Periodically publish messages
+    static unsigned long lastPublish = 0;
+    if (millis() - lastPublish > dhtpublishinterval) {
+      lastPublish = millis();
+      publishDHTData();
+    }
 
 
     if (millis() - previousrestarMillis >= resetinmls) {
