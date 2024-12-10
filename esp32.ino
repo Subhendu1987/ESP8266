@@ -7,6 +7,8 @@
 #include <DHT.h>
 #include <MQTT.h>
 #include <WiFiClientSecure.h>
+#include <HTTPClient.h>
+#include <Update.h>
 
 int relayPin1 = 23;
 int relayPin2 = 22;
@@ -21,6 +23,13 @@ int switchPin4 = 13;
 
 int irPin = 4;
 int dhtPin = 5;
+int buzzerpin = 18;
+
+// Current firmware version
+const char* current_version = "1.0.0.2";
+// Firmware filename
+String filename = "Esp32_Firmware_1.0.0.3.bin";
+
 
 #define SSID_ADDR 60         // Starting address for Wi-Fi SSID
 #define PASS_ADDR 70         // Starting address for Wi-Fi Password
@@ -48,6 +57,8 @@ bool setupmode = false;
 // DNS Server
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
+
+#define BUZZER_PIN buzzerpin 
 
 // Web server on port 80
 WebServer server(80);
@@ -84,6 +95,110 @@ unsigned long retryInterval = 10000; // Retry interval in milliseconds
 unsigned long lastRetryTime = 0;     // Timestamp of the last retry attempt
 bool wifiConnected = false;
 bool mqttsubscribe = false;
+
+// Base URL for firmware files
+const char* base_url = "https://raw.githubusercontent.com/Subhendu1987/ESP8266-ESP32-Home-Automation/refs/heads/main/";
+// Dynamically construct the firmware URL
+String firmware_url = String(base_url) + filename;
+bool updatecheck = false;
+
+void play() {
+  for (int i = 0; i < 2; i++) { // Play the tone twice
+    tone(BUZZER_PIN, 1500, 300); // Beep at 2kHz for 200ms
+    delay(350);                  // Wait for 275ms between beeps
+  }
+  noTone(BUZZER_PIN);
+}
+
+void checkForOTAUpdate() {
+  Serial.println("Checking for OTA update...");
+
+  HTTPClient http;
+  http.begin(firmware_url);
+
+  // Check if the firmware URL exists
+  int httpCode = http.GET();
+  if (httpCode != HTTP_CODE_OK) {
+    Serial.printf("Device is already up-to-date. No new firmware found.");
+    http.end();
+    updatecheck = true;
+    return;
+  }
+
+  // Extract version from firmware_url
+  String firmwareFileName = filename;
+  String otaVersion = "";
+  for (int i = 0; i < firmwareFileName.length(); i++) {
+    char c = firmwareFileName.charAt(i);
+    if (isdigit(c) || c == '.') {
+      otaVersion += c;
+    }
+  }
+
+  // Remove first two characters and the last character
+  if (otaVersion.length() > 3) {
+    otaVersion = otaVersion.substring(2, otaVersion.length() - 1);
+  }
+
+  Serial.println("Current firmware version: " + String(current_version));
+  Serial.println("Available firmware version: " + otaVersion);
+
+  // Compare versions
+  if (strcmp(otaVersion.c_str(), current_version) == 0) {
+    Serial.println("Device is already up-to-date.");
+    http.end();
+    updatecheck = true;
+    return;
+  }
+
+  Serial.println("New firmware version detected. Starting OTA update...");
+  performOTAUpdate(firmware_url.c_str());
+}
+
+void performOTAUpdate(const char* firmwareURL) {
+  updatecheck = true;
+  HTTPClient http;
+  http.begin(firmwareURL);
+
+  Serial.println("Downloading firmware...");
+
+  int httpCode = http.GET();
+  if (httpCode == HTTP_CODE_OK) {
+    int contentLength = http.getSize();
+    if (contentLength > 0) {
+      if (!Update.begin(contentLength)) {
+        Serial.println("Not enough space to begin OTA");
+        return;
+      }
+
+      WiFiClient* client = http.getStreamPtr();
+      size_t written = Update.writeStream(*client);
+      if (written == contentLength) {
+        Serial.println("OTA written successfully.");
+      } else {
+        Serial.printf("OTA written %d/%d bytes.\n", written, contentLength);
+      }
+
+      if (Update.end()) {
+        Serial.println("OTA update finished successfully.");
+        if (Update.isFinished()) {
+          Serial.println("Rebooting...");
+          ESP.restart();
+        } else {
+          Serial.println("Update not finished? Something went wrong.");
+        }
+      } else {
+        Serial.printf("Error Occurred: %s\n", Update.errorString());
+      }
+    } else {
+      Serial.println("Content length is not valid.");
+    }
+  } else {
+    Serial.printf("Failed to download firmware. HTTP code: %d\n", httpCode);
+  }
+  http.end();
+}
+
 
 void checkDoubleReset() {
     // Read the reset flag and last reset time from EEPROM
@@ -428,6 +543,7 @@ void saveRelayStates() {
   EEPROM.write(3, relayStates3);
   EEPROM.write(4, relayStates4);
   EEPROM.commit();
+  play();
 }
 // Publish DHT11 data to MQTT
 void publishDHTData() {
@@ -655,6 +771,7 @@ void handleIRSetMode() {
 
     // Resume the IR receiver for the next signal
     IrReceiver.resume();
+    play();
   }
 }
 
@@ -843,6 +960,7 @@ void connectToMQTT(){
 
 
       Serial.println("Connected to MQTT!");
+      play();
   }
   return; 
 
@@ -898,7 +1016,7 @@ void setup() {
 
     // Initialize IR receiver
     IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
-    
+    play();
   }
   
 }
@@ -933,6 +1051,9 @@ void loop() {
 
     if (millis() - previousrestarMillis >= resetinmls) {
       ESP.restart();
+    }
+    if(wifiConnected && !updatecheck){
+      checkForOTAUpdate();
     }
   }
 }
