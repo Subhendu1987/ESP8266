@@ -26,9 +26,9 @@ int dhtPin = 5;
 int buzzerpin = 18;
 
 // Current firmware version
-const char* current_version = "1.0.0.2";
+const char* current_version = "1.0.0.3";
 // Firmware filename
-String filename = "Esp32_Firmware_1.0.0.3.bin";
+String filename = "Esp32_Firmware_1.0.0.4.bin";
 
 
 #define SSID_ADDR 60         // Starting address for Wi-Fi SSID
@@ -47,8 +47,6 @@ String filename = "Esp32_Firmware_1.0.0.3.bin";
 #define RESET_TIME_ADDR 284
 
 #define DOUBLE_RESET_INTERVAL 5000 // 5 seconds (time window for the second reset)
-unsigned long previousrestarMillis = 0;
-const unsigned long resetinmls = 10800000; // 3 hours in milliseconds to schedule restart
 const unsigned long dhtpublishinterval = 60000; // 1 minutes interval for publish dht data
 
 bool setupmode = false;
@@ -1048,10 +1046,7 @@ void loop() {
       publishDHTData();
     }
 
-
-    if (millis() - previousrestarMillis >= resetinmls) {
-      ESP.restart();
-    }
+ 
     if(wifiConnected && !updatecheck){
       checkForOTAUpdate();
     }
